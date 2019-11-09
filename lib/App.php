@@ -7,6 +7,7 @@
     public function __construct(){
         
         
+        header('Content-Type: application/json; charset=utf8');
         header('Access-Control-Allow-Headers: *');
         header("Access-Control-Allow-Origin:*");
         header("Access-Control-Allow-Methods:*");
@@ -26,7 +27,7 @@
      
   private function initRouterGET(){
     Router::add('/users/:user_id/services/:service_id/tarifs',function(Request $request,Response $response, $user_id, $service_id){
-    
+   
         $db = DB::getInstance();
         $data = $db -> getDataJoin('services',["*"],['tarifs'],['services.tarif_id=tarifs.tarif_group_id'],['services.ID','services.user_id'], [$service_id,$user_id]);
         $data = empty($data) ? ["result" => "error"] : [
@@ -49,16 +50,19 @@
   private function initRouterPUT(){
 
     Router::add('/users/:user_id/services/:service_id/tarif', function(Request $request,Response $response, $user_id, $service_id){
-        $db = DB::getInstance();
-        if($db -> isExistsValue('tarifs', 'tarif_group_id', $request -> tarif_id)){
-            $db -> updateData('services',['tarif_id','payday'], [$request -> tarif_id, date('o-m-d')], ['user_id','ID'], [$user_id,$service_id]);
 
-            $data = ["result" => "ok"] ;
+        $db = DB::getInstance();
+        
+        if($db -> isExistsValue('tarifs', 'tarif_group_id', $request -> tarif_id)){
+            $data = $db -> updateData('services',['tarif_id','payday'], [$request -> tarif_id, date('o-m-d')], ['user_id','ID'], [$user_id,$service_id]) ?
+             ["result" => 'ok'] :
+             ["result" => "error"];
+
         }
         else{
             $data = ["result" => "error"] ;
         }
-        // $data = $db -> getDataJoin('services',["*"],['tarifs'],['services.tarif_id=tarifs.tarif_group_id'],['services.ID','services.user_id','services.tarif_id'], [$service_id, $user_id, $request -> tarif_id]);
+            
       
         $response -> sendJson($data);
       });

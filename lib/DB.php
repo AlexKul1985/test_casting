@@ -91,8 +91,8 @@
             $stmt = self::$db_conn->prepare($this -> updateQuery($table_name,$fields,$where_fields));
             // echo $this -> updateQuery($table_name,$field,$where_fields);
             array_unshift($where_values,...$newValues);
-            $stmt->execute($where_values);
-            return $stmt->fetchAll();
+            
+            return $stmt->execute($where_values);
         }
         public function isExistsValue(string $table_name, $field, $value){
             $stmt = self::$db_conn->prepare('SELECT 1 FROM '.$table_name.' WHERE '.$field.' = ?');
